@@ -1,3 +1,6 @@
+/**
+ * Serviço de negócio da NF-e: orquestra validação, geração de XML, persistência e envio ao SEFAZ (mock).
+ */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { NfeRepository } from './nfe.repository';
 import { NfeValidationService } from './nfe-validation.service';
@@ -14,6 +17,7 @@ export class NfeService {
     private readonly xmlValidator: XmlValidatorService,
   ) {}
 
+  /** Valida DTO, gera XML, persiste a nota e dispara processamento assíncrono com a SEFAZ. */
   async emitir(dto: CreateNFeDto) {
     this.validation.validateCreateDto(dto);
 
@@ -50,12 +54,13 @@ export class NfeService {
       emitente,
       dto,
       xmlEnviado,
+      numero,
       null,
       null,
       'em_processamento',
     );
 
-    // Processamento assíncrono com SEFAZ (mock)
+    // Processamento assíncrono com SEFAZ (mock) — simula fila de emissão
     this.processarSefaz(nota.id, xmlEnviado).catch(() => {});
 
     return {
@@ -66,6 +71,7 @@ export class NfeService {
     };
   }
 
+  /** Envia XML ao SEFAZ (mock) e atualiza status da nota para autorizada ou rejeitada. */
   private async processarSefaz(notaId: string, xmlEnviado: string): Promise<void> {
     const result = await this.sefaz.enviarNota(xmlEnviado);
     if (result.success && result.protocolo && result.chaveAcesso) {
@@ -83,6 +89,7 @@ export class NfeService {
     }
   }
 
+  /** Retorna status, protocolo e motivo de rejeição (se houver) da NF-e. */
   async getStatus(id: string) {
     const nota = await this.repository.findById(id);
     if (!nota) throw new NotFoundException('NF-e não encontrada');
@@ -97,6 +104,7 @@ export class NfeService {
     };
   }
 
+  /** Retorna o XML da NF-e autorizada; falha se não existir ou não estiver autorizada. */
   async getXml(id: string): Promise<{ xml: string }> {
     const nota = await this.repository.findById(id);
     if (!nota) throw new NotFoundException('NF-e não encontrada');

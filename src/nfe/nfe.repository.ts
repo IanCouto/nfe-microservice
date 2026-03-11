@@ -1,3 +1,6 @@
+/**
+ * Repositório NF-e: persistência de clientes, notas fiscais e itens; próximo número e atualização de status.
+ */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,6 +20,7 @@ export class NfeRepository {
     private readonly produtoRepo: Repository<Produto>,
   ) {}
 
+  /** Busca ou cria o cliente emitente pelo CNPJ. */
   async findOrCreateEmitente(dto: CreateNFeDto): Promise<Cliente> {
     let emitente = await this.clienteRepo.findOne({ where: { cnpj: dto.emitenteCnpj } });
     if (!emitente) {
@@ -30,6 +34,7 @@ export class NfeRepository {
     return emitente;
   }
 
+  /** Retorna o próximo número de NF-e (MAX(numero)+1). */
   async getNextNumero(): Promise<string> {
     const result = await this.notaFiscalRepo
       .createQueryBuilder('n')
@@ -38,16 +43,19 @@ export class NfeRepository {
     return String(result?.next ?? 1);
   }
 
+  /**
+   * Cria a nota fiscal no banco usando o número já reservado (evita race entre XML e registro).
+   */
   async createNotaFiscal(
     emitente: Cliente,
     dto: CreateNFeDto,
     xmlEnviado: string,
+    numero: string,
     protocolo: string | null,
     chaveAcesso: string | null,
     status: 'em_processamento' | 'autorizada' | 'rejeitada',
     motivoRejeicao?: string,
   ): Promise<NotaFiscal> {
-    const numero = await this.getNextNumero();
     const valorTotal = dto.itens.reduce(
       (sum, i) => sum + i.quantidade * i.valorUnitario,
       0,
@@ -91,6 +99,7 @@ export class NfeRepository {
     }) as Promise<NotaFiscal>;
   }
 
+  /** Atualiza a nota para status autorizada com protocolo, chave e XML. */
   async updateNotaAutorizada(
     id: string,
     protocolo: string,
@@ -105,6 +114,7 @@ export class NfeRepository {
     });
   }
 
+  /** Atualiza a nota para status rejeitada e grava o motivo. */
   async updateNotaRejeitada(id: string, motivoRejeicao: string): Promise<void> {
     await this.notaFiscalRepo.update(id, {
       status: 'rejeitada',
@@ -112,6 +122,7 @@ export class NfeRepository {
     });
   }
 
+  /** Busca nota fiscal por ID com itens e emitente. */
   async findById(id: string): Promise<NotaFiscal | null> {
     return this.notaFiscalRepo.findOne({
       where: { id },
