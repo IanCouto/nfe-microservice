@@ -1,3 +1,6 @@
+/**
+ * Estratégia Passport JWT: extrai token do header Authorization e valida com AuthService.
+ */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,6 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /** Chamado após verificação da assinatura; retorna o usuário para anexar ao request. */
   async validate(payload: { sub: string }) {
     const user = await this.authService.validateUser(payload);
     if (!user) throw new UnauthorizedException();

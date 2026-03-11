@@ -1,10 +1,10 @@
+/**
+ * Validação e construção de XML da NF-e (estrutura NFe/infNFe/ide,emit,dest,det).
+ * Simula validação via XSD; em produção usar lib com XSD oficial.
+ */
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { XMLParser } from 'fast-xml-parser';
 
-/**
- * Validação de XML da NF-e conforme estrutura esperada (simulação de validação via XSD).
- * Em produção, usar libxmljs2 ou similar com XSD real.
- */
 @Injectable()
 export class XmlValidatorService {
   private readonly parser = new XMLParser({
@@ -12,6 +12,7 @@ export class XmlValidatorService {
     removeNSPrefix: true,
   });
 
+  /** Valida se o XML possui raiz NFe/nfeProc, infNFe, ide, emit, dest e ao menos um det. */
   validateNFeXml(xml: string): void {
     if (!xml || typeof xml !== 'string') {
       throw new BadRequestException('XML inválido ou vazio');
@@ -56,9 +57,7 @@ export class XmlValidatorService {
     }
   }
 
-  /**
-   * Gera XML simplificado da NF-e para envio ao mock SEFAZ.
-   */
+  /** Gera XML da NF-e no padrão Portal da NF-e para envio ao mock SEFAZ. */
   buildNFeXml(data: {
     numero: string;
     serie: string;
@@ -136,6 +135,7 @@ export class XmlValidatorService {
 </nfeProc>`;
   }
 
+  /** Escapa caracteres especiais para uso seguro em XML. */
   private escapeXml(str: string): string {
     return String(str)
       .replace(/&/g, '&amp;')

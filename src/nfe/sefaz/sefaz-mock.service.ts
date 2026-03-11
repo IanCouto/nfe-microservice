@@ -1,3 +1,6 @@
+/**
+ * Mock do webservice SEFAZ para homologação: simula envio da NF-e e retorno do protocolo de autorização.
+ */
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,12 +11,9 @@ export interface SefazEnvioResult {
   chaveAcesso?: string;
 }
 
-/**
- * Mock do webservice SEFAZ para homologação.
- * Simula envio da nota e retorno do protocolo de autorização.
- */
 @Injectable()
 export class SefazMockService {
+  /** Simula o envio da nota à SEFAZ: delay e retorno com protocolo e chave de 44 dígitos. */
   async enviarNota(xmlEnviado: string): Promise<SefazEnvioResult> {
     // Simula validação e resposta da SEFAZ (homologação: sempre autoriza após pequeno delay)
     await this.delay(300);
@@ -28,6 +28,7 @@ export class SefazMockService {
     };
   }
 
+  /** Gera chave NF-e de 44 dígitos (formato simplificado para mock). */
   private gerarChaveAcesso(): string {
     // Chave NF-e 44 dígitos (simplificado para mock)
     const uf = '35'; // SP

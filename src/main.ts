@@ -1,10 +1,16 @@
+/**
+ * Ponto de entrada da aplicação NF-e.
+ * Inicializa o NestJS, pipe de validação global, Swagger e sobe o servidor HTTP.
+ */
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
+/** Inicializa e sobe a API REST do microserviço de NF-e. */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // Validação global: remove campos não declarados e transforma tipos (ex.: string -> number)
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -13,6 +19,7 @@ async function bootstrap() {
     }),
   );
 
+  // Documentação OpenAPI (Swagger) em /api
   const config = new DocumentBuilder()
     .setTitle('NF-e Microservice API')
     .setDescription('API para emissão de Nota Fiscal Eletrônica - Desafio Técnico Backend')

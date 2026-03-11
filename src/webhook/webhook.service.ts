@@ -1,3 +1,6 @@
+/**
+ * Serviço do webhook: processa retorno simulado da SEFAZ e atualiza status da NF-e (autorizada/rejeitada).
+ */
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +14,7 @@ export class WebhookService {
     private readonly notaFiscalRepo: Repository<NotaFiscal>,
   ) {}
 
+  /** Atualiza a nota conforme status (autorizada com protocolo/chave ou rejeitada com motivo). */
   async processarRetorno(dto: RetornoSefazDto) {
     if (!dto.notaFiscalId) {
       throw new BadRequestException('notaFiscalId é obrigatório');

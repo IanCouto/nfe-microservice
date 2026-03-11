@@ -1,3 +1,6 @@
+/**
+ * Módulo do webhook: endpoint para simular retorno/callback da SEFAZ (atualização de status da NF-e).
+ */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotaFiscal } from '../entities';

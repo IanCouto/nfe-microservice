@@ -1,3 +1,7 @@
+/**
+ * Entidade Produto: cadastro de produtos (descrição, NCM, CST, CFOP, valor).
+ * Pode ser referenciado nos itens da nota fiscal.
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,

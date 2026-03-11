@@ -1,3 +1,7 @@
+/**
+ * Entidade Nota Fiscal (NF-e): número, série, status, protocolo SEFAZ, XML e dados do destinatário.
+ * Status: em_processamento, autorizada ou rejeitada.
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,

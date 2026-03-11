@@ -7,6 +7,7 @@ import { CreateNFeDto } from './dto/create-nfe.dto';
  */
 @Injectable()
 export class NfeValidationService {
+  /** Valida DTO de criação: CNPJ (algoritmo oficial), itens, CFOP/CST por item. */
   validateCreateDto(dto: CreateNFeDto): void {
     const errors: string[] = [];
 
@@ -40,9 +41,7 @@ export class NfeValidationService {
     }
   }
 
-  /**
-   * Validação básica de CNPJ (dígitos verificadores).
-   */
+  /** Validação de CNPJ pelos dígitos verificadores (algoritmo oficial). */
   private isCnpjValid(cnpj: string): boolean {
     if (!cnpj || cnpj.length !== 14) return false;
     if (/^(\d)\1+$/.test(cnpj)) return false; // rejeita todos iguais

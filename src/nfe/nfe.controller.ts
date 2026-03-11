@@ -1,3 +1,6 @@
+/**
+ * Controller NF-e: POST /nfe (emitir), GET /nfe/:id (status), GET /nfe/:id/xml (XML autorizado).
+ */
 import { Controller, Get, Post, Body, Param, ParseUUIDPipe, Header } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { NfeService } from './nfe.service';
@@ -8,6 +11,7 @@ import { CreateNFeDto } from './dto/create-nfe.dto';
 export class NfeController {
   constructor(private readonly nfeService: NfeService) {}
 
+  /** Recebe dados da NF-e e inicia o processo de emissão (validação, XML, envio SEFAZ em background). */
   @Post()
   @ApiOperation({ summary: 'Enviar NF-e para emissão' })
   @ApiResponse({ status: 201, description: 'NF-e recebida e em processamento' })
@@ -16,6 +20,7 @@ export class NfeController {
     return this.nfeService.emitir(dto);
   }
 
+  /** Retorna o status atual da nota: em_processamento, autorizada ou rejeitada. */
   @Get(':id')
   @ApiOperation({ summary: 'Consultar status da NF-e' })
   @ApiResponse({ status: 200, description: 'Status da nota (em_processamento, autorizada, rejeitada)' })
@@ -24,6 +29,7 @@ export class NfeController {
     return this.nfeService.getStatus(id);
   }
 
+  /** Retorna o XML da NF-e autorizada (disponível apenas quando status = autorizada). */
   @Get(':id/xml')
   @ApiOperation({ summary: 'Obter XML da NF-e autorizada' })
   @ApiResponse({ status: 200, description: 'XML da NF-e' })

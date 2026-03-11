@@ -1,3 +1,7 @@
+/**
+ * Configuração do banco de dados (PostgreSQL) via variáveis de ambiente.
+ * Usado pelo TypeORM no AppModule.
+ */
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('database', () => ({

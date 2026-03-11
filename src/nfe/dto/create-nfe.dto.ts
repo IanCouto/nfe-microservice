@@ -1,3 +1,6 @@
+/**
+ * DTOs para criação de NF-e: emitente, destinatário e itens com validação (CNPJ, CFOP, CST, NCM).
+ */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsString,
@@ -12,6 +15,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+/** Item da nota: descrição, quantidade, valor unitário, CFOP, CST, NCM (opcionais). */
 export class NFeItemDto {
   @ApiProperty({ description: 'Descrição do item' })
   @IsString()
@@ -53,6 +57,7 @@ export class NFeItemDto {
   produtoId?: string;
 }
 
+/** Payload para emissão de NF-e: emitente, destinatário e lista de itens. */
 export class CreateNFeDto {
   @ApiProperty({ description: 'CNPJ do emitente', example: '12345678000195' })
   @IsString()

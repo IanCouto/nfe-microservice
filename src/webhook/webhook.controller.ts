@@ -1,7 +1,11 @@
+/**
+ * Controller do webhook: simula retorno/callback da SEFAZ (autorizada ou rejeitada).
+ */
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookService } from './webhook.service';
 
+/** Payload para simular o retorno da SEFAZ (notaFiscalId, status, protocolo, chave, etc.). */
 export class RetornoSefazDto {
   @ApiPropertyOptional({ description: 'ID da NF-e' })
   notaFiscalId?: string;
@@ -22,6 +26,7 @@ export class RetornoSefazDto {
 export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
+  /** Recebe callback simulado da SEFAZ e atualiza a nota (autorizada ou rejeitada). */
   @Post('retorno-sefaz')
   @ApiOperation({
     summary: 'Simular retorno/callback da SEFAZ',

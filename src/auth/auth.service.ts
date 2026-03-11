@@ -1,3 +1,6 @@
+/**
+ * Serviço de autenticação: valida credenciais (env) e emite JWT; valida payload para o guard.
+ */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
@@ -5,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
+  /** Compara usuário/senha com AUTH_USER e AUTH_PASSWORD e retorna access_token. */
   async login(username: string, password: string): Promise<{ access_token: string }> {
     const validUser = process.env.AUTH_USER || 'admin';
     const validPass = process.env.AUTH_PASSWORD || 'admin';
@@ -17,6 +21,7 @@ export class AuthService {
     };
   }
 
+  /** Usado pela JwtStrategy: valida o payload do token e retorna o usuário. */
   async validateUser(payload: { sub: string }): Promise<{ username: string }> {
     return { username: payload.sub };
   }

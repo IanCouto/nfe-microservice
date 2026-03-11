@@ -1,3 +1,6 @@
+/**
+ * Controller de autenticação: endpoint POST /auth/login para obter token JWT.
+ */
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiProperty } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -15,6 +18,7 @@ export class LoginDto {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /** Autentica usuário/senha e retorna access_token JWT (rota pública). */
   @Post('login')
   @Public()
   @ApiOperation({ summary: 'Login e obter JWT' })

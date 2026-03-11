@@ -1,3 +1,7 @@
+/**
+ * Módulo raiz da aplicação: configura env, TypeORM (PostgreSQL), Auth, NF-e e Webhook.
+ * JWT pode ser exigido globalmente via JWT_REQUIRED=true.
+ */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';

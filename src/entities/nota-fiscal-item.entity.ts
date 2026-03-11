@@ -1,3 +1,6 @@
+/**
+ * Entidade Item da Nota Fiscal: linha da NF-e (produto, quantidade, valor, CFOP, CST, NCM).
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,

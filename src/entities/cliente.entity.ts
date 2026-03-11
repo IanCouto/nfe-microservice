@@ -1,3 +1,6 @@
+/**
+ * Entidade Cliente: emitente ou destinatário de NF-e (razão social, CNPJ, IE, endereço).
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,

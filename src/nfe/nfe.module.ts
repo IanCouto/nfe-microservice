@@ -1,3 +1,6 @@
+/**
+ * Módulo NF-e: controller, service, repository, validação e integração SEFAZ (mock + XML).
+ */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cliente, NotaFiscal, NotaFiscalItem, Produto } from '../entities';
