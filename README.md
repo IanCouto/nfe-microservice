@@ -135,14 +135,16 @@ Após alguns segundos, o mock SEFAZ autoriza a nota e o status em `GET /nfe/:id`
 
 ## Funcionalidades implementadas
 
-### Obrigatórias
+O código inclui **comentários em português** em arquivos e funções importantes, explicando a função de cada parte.
 
-- API RESTful: `POST /nfe`, `GET /nfe/:id`, `GET /nfe/:id/xml`
-- Integração com webservice SEFAZ (mock de homologação): envio da nota e recebimento de protocolo de autorização
-- Validação de XML da NF-e (estrutura e campos obrigatórios)
-- Modelagem e persistência em PostgreSQL: clientes, produtos, notas fiscais e itens
-- Validação de campos obrigatórios (CNPJ, IE, CFOP, CST, etc.)
-- Versionamento com Git e README com instruções de execução
+### Obrigatórias (checklist do desafio)
+
+- [x] **API RESTful**: `POST /nfe` (recebe dados e inicia emissão), `GET /nfe/:id` (status), `GET /nfe/:id/xml` (XML autorizado)
+- [x] **Integração SEFAZ**: mock de homologação — simula envio da nota e recebimento do protocolo de autorização
+- [x] **Validação de XML**: via estrutura NFe/infNFe (simulação de validação XSD)
+- [x] **PostgreSQL**: entidades clientes, produtos, notas fiscais e itens
+- [x] **Validação fiscal**: CNPJ (dígitos verificadores), IE, CFOP (4 dígitos), CST, itens obrigatórios
+- [x] **Git + README**: versionamento e instruções para rodar o projeto
 
 ### Diferenciais
 
