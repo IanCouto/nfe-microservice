@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import databaseConfig from './config/database.config';
 import { Cliente, NotaFiscal, NotaFiscalItem, Produto } from './entities';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { NfeModule } from './nfe/nfe.module';
+import { WebhookModule } from './webhook/webhook.module';
 
 @Module({
   imports: [
@@ -26,9 +30,16 @@ import { NfeModule } from './nfe/nfe.module';
         logging: process.env.NODE_ENV === 'development',
       }),
     }),
+    AuthModule,
     NfeModule,
+    WebhookModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    ...(process.env.JWT_REQUIRED === 'true'
+      ? [{ provide: APP_GUARD, useClass: JwtAuthGuard }]
+      : []),
+  ],
 })
 export class AppModule {}
