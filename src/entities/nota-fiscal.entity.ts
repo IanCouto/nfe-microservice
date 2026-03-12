@@ -22,13 +22,13 @@ export class NotaFiscal {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'numero', unique: true })
+  @Column({ name: 'numero', type: 'varchar', length: 20, unique: true })
   numero: string;
 
-  @Column({ name: 'serie', length: 3, default: '1' })
+  @Column({ name: 'serie', type: 'varchar', length: 3, default: '1' })
   serie: string;
 
-  @Column({ name: 'emitente_id' })
+  @Column({ name: 'emitente_id', type: 'uuid' })
   emitenteId: string;
 
   @ManyToOne(() => Cliente, (c) => c.notasFiscais)
@@ -43,7 +43,7 @@ export class NotaFiscal {
   })
   status: StatusNFe;
 
-  @Column({ name: 'protocolo_autorizacao', length: 50, nullable: true })
+  @Column({ name: 'protocolo_autorizacao', type: 'varchar', length: 50, nullable: true })
   protocoloAutorizacao: string | null;
 
   @Column({ name: 'xml_autorizado', type: 'text', nullable: true })
@@ -55,19 +55,19 @@ export class NotaFiscal {
   @Column({ name: 'motivo_rejeicao', type: 'text', nullable: true })
   motivoRejeicao: string | null;
 
-  @Column({ name: 'destinatario_cnpj', length: 14 })
+  @Column({ name: 'destinatario_cnpj', type: 'varchar', length: 14 })
   destinatarioCnpj: string;
 
-  @Column({ name: 'destinatario_ie', length: 20, nullable: true })
+  @Column({ name: 'destinatario_ie', type: 'varchar', length: 20, nullable: true })
   destinatarioIe: string | null;
 
-  @Column({ name: 'destinatario_razao_social', length: 255 })
+  @Column({ name: 'destinatario_razao_social', type: 'varchar', length: 255 })
   destinatarioRazaoSocial: string;
 
   @Column({ name: 'valor_total', type: 'decimal', precision: 18, scale: 4, default: 0 })
   valorTotal: number;
 
-  @Column({ name: 'chave_acesso', length: 44, nullable: true })
+  @Column({ name: 'chave_acesso', type: 'varchar', length: 44, nullable: true })
   chaveAcesso: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

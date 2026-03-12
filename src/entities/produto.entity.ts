@@ -15,26 +15,26 @@ export class Produto {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ name: 'descricao', type: 'varchar', length: 255 })
   descricao: string;
 
-  @Column({ length: 20, nullable: true })
-  codigo: string;
+  @Column({ name: 'codigo', type: 'varchar', length: 20, nullable: true })
+  codigo: string | null;
 
   @Column({ type: 'decimal', precision: 18, scale: 4, default: 0 })
   valorUnitario: number;
 
-  @Column({ length: 10, default: 'UN' })
+  @Column({ name: 'unidade', type: 'varchar', length: 10, default: 'UN' })
   unidade: string;
 
-  @Column({ name: 'ncm', length: 10, nullable: true })
-  ncm: string;
+  @Column({ name: 'ncm', type: 'varchar', length: 10, nullable: true })
+  ncm: string | null;
 
-  @Column({ name: 'cst', length: 3, nullable: true })
-  cst: string;
+  @Column({ name: 'cst', type: 'varchar', length: 3, nullable: true })
+  cst: string | null;
 
-  @Column({ name: 'cfop', length: 4, nullable: true })
-  cfop: string;
+  @Column({ name: 'cfop', type: 'varchar', length: 4, nullable: true })
+  cfop: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

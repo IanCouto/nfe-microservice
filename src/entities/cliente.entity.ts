@@ -16,29 +16,29 @@ export class Cliente {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'razao_social', length: 255 })
+  @Column({ name: 'razao_social', type: 'varchar', length: 255 })
   razaoSocial: string;
 
-  @Column({ name: 'nome_fantasia', length: 255, nullable: true })
-  nomeFantasia: string;
+  @Column({ name: 'nome_fantasia', type: 'varchar', length: 255, nullable: true })
+  nomeFantasia: string | null;
 
-  @Column({ length: 14, unique: true })
+  @Column({ name: 'cnpj', type: 'varchar', length: 14, unique: true })
   cnpj: string;
 
-  @Column({ name: 'inscricao_estadual', length: 20, nullable: true })
+  @Column({ name: 'inscricao_estadual', type: 'varchar', length: 20, nullable: true })
   inscricaoEstadual: string | null;
 
-  @Column({ length: 255, nullable: true })
-  endereco: string;
+  @Column({ name: 'endereco', type: 'varchar', length: 255, nullable: true })
+  endereco: string | null;
 
-  @Column({ length: 10, nullable: true })
-  municipio: string;
+  @Column({ name: 'municipio', type: 'varchar', length: 10, nullable: true })
+  municipio: string | null;
 
-  @Column({ length: 2, nullable: true })
-  uf: string;
+  @Column({ name: 'uf', type: 'varchar', length: 2, nullable: true })
+  uf: string | null;
 
-  @Column({ length: 10, nullable: true })
-  cep: string;
+  @Column({ name: 'cep', type: 'varchar', length: 10, nullable: true })
+  cep: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

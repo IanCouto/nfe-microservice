@@ -17,21 +17,21 @@ export class NotaFiscalItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'nota_fiscal_id' })
+  @Column({ name: 'nota_fiscal_id', type: 'uuid' })
   notaFiscalId: string;
 
   @ManyToOne(() => NotaFiscal, (nfe) => nfe.itens, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'nota_fiscal_id' })
   notaFiscal: NotaFiscal;
 
-  @Column({ name: 'produto_id', nullable: true })
+  @Column({ name: 'produto_id', type: 'uuid', nullable: true })
   produtoId: string | null;
 
   @ManyToOne(() => Produto, { nullable: true })
   @JoinColumn({ name: 'produto_id' })
   produto: Produto | null;
 
-  @Column({ length: 255 })
+  @Column({ name: 'descricao', type: 'varchar', length: 255 })
   descricao: string;
 
   @Column({ type: 'decimal', precision: 18, scale: 4 })
@@ -43,13 +43,13 @@ export class NotaFiscalItem {
   @Column({ name: 'valor_total', type: 'decimal', precision: 18, scale: 4 })
   valorTotal: number;
 
-  @Column({ length: 4, nullable: true })
+  @Column({ name: 'cfop', type: 'text', nullable: true })
   cfop: string | null;
 
-  @Column({ length: 3, nullable: true })
+  @Column({ name: 'cst', type: 'text', nullable: true })
   cst: string | null;
 
-  @Column({ name: 'ncm', length: 10, nullable: true })
+  @Column({ name: 'ncm', type: 'text', nullable: true })
   ncm: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

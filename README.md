@@ -4,11 +4,30 @@ Microserviço de emissão de **Nota Fiscal Eletrônica (NF-e)** com API RESTful,
 
 ## Requisitos
 
-- **Node.js** 18+ (recomendado 20)
+- **Node.js** 18+ (local). **Node 24** no Docker e no CI.
 - **PostgreSQL** 14+ (ou use Docker)
 - **npm** 9+
 
 ## Instalação e execução
+
+### Script único (deixar a API funcionando)
+
+Para subir o ambiente e deixar a API respondendo com um comando:
+
+- **Windows (PowerShell):**
+  ```powershell
+  .\run.ps1
+  ```
+  Se a execução de scripts estiver bloqueada: `powershell -ExecutionPolicy Bypass -File run.ps1`
+- **Linux / macOS:**
+  ```bash
+  chmod +x run.sh
+  ./run.sh
+  ```
+
+O script cria `.env` se não existir, sobe PostgreSQL e a API (via Docker Compose, se Docker estiver instalado) ou usa PostgreSQL local + `npm run build` e inicia a API em segundo plano. Ao final, a API estará em **http://localhost:3000** e o Swagger em **http://localhost:3000/api**.
+
+No **Windows**, o Docker Desktop usa o comando `docker compose` (com espaço); o script detecta automaticamente `docker compose` ou `docker-compose`.
 
 ### 1. Clonar e instalar dependências
 
@@ -28,7 +47,7 @@ cp .env.example .env
 
 Principais variáveis:
 
-| Variável        | Descrição                    | Padrão     |
+| Variável       | Descrição                    | Padrão     |
 |----------------|-----------------------------|------------|
 | `PORT`         | Porta da API                | 3000       |
 | `DB_HOST`      | Host do PostgreSQL          | localhost  |
@@ -43,10 +62,11 @@ Principais variáveis:
 
 **Opção A – Docker (recomendado)**
 
-Subir apenas o PostgreSQL para desenvolvimento:
+Subir apenas o PostgreSQL para desenvolvimento (no Windows com Docker Desktop use `docker compose` em vez de `docker-compose`):
 
 ```bash
-docker-compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml up -d
+# ou: docker-compose -f docker-compose.dev.yml up -d
 ```
 
 Criar o banco (se não existir):
@@ -58,7 +78,8 @@ Criar o banco (se não existir):
 **Opção B – App + PostgreSQL com Docker**
 
 ```bash
-docker-compose up -d
+docker compose up -d
+# ou: docker-compose up -d
 ```
 
 A API estará em `http://localhost:3000`.
@@ -88,15 +109,15 @@ Com a aplicação rodando:
 
 ## Endpoints principais
 
-| Método | Rota              | Descrição                                      |
-|--------|-------------------|-------------------------------------------------|
-| GET    | `/`               | Mensagem de boas-vindas                         |
-| GET    | `/health`         | Health check                                    |
-| POST   | `/nfe`            | Enviar NF-e para emissão                        |
-| GET    | `/nfe/:id`        | Consultar status da NF-e                        |
-| GET    | `/nfe/:id/xml`    | Obter XML da NF-e autorizada                    |
+| Método | Rota                     | Descrição                                      |
+|--------|--------------------------|-------------------------------------------------|
+| GET    | `/`                      | Mensagem de boas-vindas                         |
+| GET    | `/health`                | Health check                                    |
+| POST   | `/nfe`                   | Enviar NF-e para emissão                        |
+| GET    | `/nfe/:id`               | Consultar status da NF-e                        |
+| GET    | `/nfe/:id/xml`           | Obter XML da NF-e autorizada                    |
 | POST   | `/webhook/retorno-sefaz` | Simular retorno/callback da SEFAZ (homologação) |
-| POST   | `/auth/login`     | Login e obter JWT (opcional)                    |
+| POST   | `/auth/login`            | Login e obter JWT (opcional)                    |
 
 ### Exemplo – Emitir NF-e
 
@@ -158,18 +179,22 @@ O código inclui **comentários em português** em arquivos e funções importan
 - **Estrutura em camadas**: controller, service, repository, entities, DTOs
 - **Webhook** `/webhook/retorno-sefaz` para simular retorno da SEFAZ
 
+## Segurança e dependências
+
+- `npm audit` pode reportar vulnerabilidades; várias vêm de **devDependencies** (NestJS CLI, Angular DevKit, etc.). Use `npm audit fix` para correções seguras; `npm audit fix --force` pode exigir atualizações major — teste o projeto após.
+
 ## Scripts
 
-| Comando           | Descrição                |
-|-------------------|--------------------------|
-| `npm run start`   | Inicia a aplicação       |
-| `npm run start:dev` | Inicia em modo watch   |
-| `npm run build`   | Gera build de produção   |
+| Comando              | Descrição                |
+|----------------------|--------------------------|
+| `npm run start`      | Inicia a aplicação       |
+| `npm run start:dev`  | Inicia em modo watch   |
+| `npm run build`      | Gera build de produção   |
 | `npm run start:prod` | Roda o build de produção |
-| `npm run test`    | Testes unitários         |
-| `npm run test:e2e`| Testes e2e               |
-| `npm run test:cov`| Cobertura de testes      |
-| `npm run lint`    | Linter                   |
+| `npm run test`       | Testes unitários         |
+| `npm run test:e2e`   | Testes e2e               |
+| `npm run test:cov`   | Cobertura de testes      |
+| `npm run lint`       | Linter                   |
 
 ## Estrutura do projeto
 
