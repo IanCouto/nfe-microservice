@@ -1,14 +1,40 @@
 # NF-e Microservice – Desafio Técnico Backend
 
+**Repositório:** [github.com/IanCouto/nfe-microservice](https://github.com/IanCouto/nfe-microservice)
+
 Microserviço de emissão de **Nota Fiscal Eletrônica (NF-e)** com API RESTful, integração com ambiente de homologação SEFAZ (mock), validação de XML e persistência em PostgreSQL.
 
-## Requisitos
+---
+
+## Testar com Docker
+
+**Requisito:** ter o [Docker](https://www.docker.com/get-started) instalado e em execução (Docker Desktop no Windows/Mac ou Docker Engine no Linux).
+
+Quem baixar o projeto e quiser apenas rodar e testar a API com Docker:
+
+```bash
+git clone https://github.com/IanCouto/nfe-microservice.git
+cd nfe-microservice
+docker compose up -d
+```
+
+Aguarde alguns segundos (na primeira vez o build da imagem pode levar 1–2 minutos). Depois:
+
+- **API:** http://localhost:3000  
+- **Swagger (documentação e testes):** http://localhost:3000/api  
+- **Health:** http://localhost:3000/health  
+
+Para parar: `docker compose down`.
+
+---
+
+## Requisitos (execução local sem Docker)
 
 - **Node.js** 18+ (local). **Node 24** no Docker e no CI.
-- **PostgreSQL** 14+ (ou use Docker)
+- **PostgreSQL** 14+ (ou use Docker só para o banco)
 - **npm** 9+
 
-## Instalação e execução
+## Instalação e execução (local)
 
 ### Script único (deixar a API funcionando)
 
@@ -32,8 +58,8 @@ No **Windows**, o Docker Desktop usa o comando `docker compose` (com espaço); o
 ### 1. Clonar e instalar dependências
 
 ```bash
-git clone <repo-url>
-cd backend
+git clone https://github.com/IanCouto/nfe-microservice.git
+cd nfe-microservice
 npm install
 ```
 
@@ -75,7 +101,7 @@ Criar o banco (se não existir):
 # PostgreSQL cria o DB automaticamente com docker-compose.dev.yml
 ```
 
-**Opção B – App + PostgreSQL com Docker**
+**Opção B – App + PostgreSQL com Docker** (igual à seção **Testar com Docker** no início)
 
 ```bash
 docker compose up -d
@@ -208,6 +234,20 @@ src/
 ├── app.module.ts
 └── main.ts
 ```
+
+## Repositório e primeiro push
+
+O repositório remoto está configurado como **https://github.com/IanCouto/nfe-microservice**. Se o repositório ainda não existir no GitHub:
+
+1. Acesse [github.com/new](https://github.com/new).
+2. Nome do repositório: **nfe-microservice**.
+3. Crie **sem** README, .gitignore ou licença (o projeto já tem).
+4. Depois, na pasta do projeto:
+   ```bash
+   git push -u origin master
+   ```
+
+(O frontend ficará em um repositório separado: **IanCouto/nfe-microservice-frontend** ou similar.)
 
 ## Licença
 
