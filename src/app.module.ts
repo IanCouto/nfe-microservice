@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { NfeModule } from './nfe/nfe.module';
 import { WebhookModule } from './webhook/webhook.module';
+import { ClientesModule } from './clientes/clientes.module';
 
 @Module({
   imports: [
@@ -30,11 +31,13 @@ import { WebhookModule } from './webhook/webhook.module';
         password: process.env.DB_PASSWORD || 'postgres',
         database: process.env.DB_DATABASE || 'nfe_db',
         entities: [Cliente, Produto, NotaFiscal, NotaFiscalItem],
-        synchronize: process.env.NODE_ENV !== 'production',
+        // DB_SYNC=true no Docker cria as tabelas na primeira subida; em produção real use migrations
+        synchronize: process.env.DB_SYNC === 'true' || process.env.NODE_ENV !== 'production',
         logging: process.env.NODE_ENV === 'development',
       }),
     }),
     AuthModule,
+    ClientesModule,
     NfeModule,
     WebhookModule,
   ],
