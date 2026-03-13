@@ -14,7 +14,7 @@ export interface SefazEnvioResult {
 @Injectable()
 export class SefazMockService {
   /** Simula o envio da nota à SEFAZ: delay e retorno com protocolo e chave de 44 dígitos. */
-  async enviarNota(xmlEnviado: string): Promise<SefazEnvioResult> {
+  async enviarNota(_xmlEnviado: string): Promise<SefazEnvioResult> {
     // Simula validação e resposta da SEFAZ (homologação: sempre autoriza após pequeno delay)
     await this.delay(300);
 
