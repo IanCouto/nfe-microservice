@@ -27,7 +27,33 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      /*
+       * Ordena as operações no Swagger sempre por método:
+       * GET -> POST -> PATCH -> DELETE (depois demais),
+       * mantendo a ordenação alfabética por path dentro de cada método.
+       */
+      operationsSorter: (a: any, b: any) => {
+        const order: Record<string, number> = {
+          get: 0,
+          post: 1,
+          patch: 2,
+          put: 3,
+          delete: 4,
+        };
+        const methodA = a.get('method');
+        const methodB = b.get('method');
+        const weightA = order[methodA] ?? 99;
+        const weightB = order[methodB] ?? 99;
+
+        if (weightA !== weightB) {
+          return weightA - weightB;
+        }
+        return a.get('path').localeCompare(b.get('path'));
+      },
+    },
+  });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

@@ -12,12 +12,6 @@ import { UpdateClienteDto } from './dto/update-cliente.dto';
 export class ClientesController {
   constructor(private readonly clientesService: ClientesService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Criar cliente' })
-  create(@Body() dto: CreateClienteDto) {
-    return this.clientesService.create(dto);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Listar todos os clientes' })
   findAll() {
@@ -34,6 +28,12 @@ export class ClientesController {
   @ApiOperation({ summary: 'Atualizar cliente' })
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateClienteDto) {
     return this.clientesService.update(id, dto);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Criar cliente' })
+  create(@Body() dto: CreateClienteDto) {
+    return this.clientesService.create(dto);
   }
 
   @Delete(':id')

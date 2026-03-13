@@ -3,13 +3,19 @@
  */
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
 
 export class LoginDto {
   @ApiProperty({ example: 'admin' })
+  @IsString()
+  @IsNotEmpty()
   username!: string;
+
   @ApiProperty({ example: 'admin' })
+  @IsString()
+  @IsNotEmpty()
   password!: string;
 }
 

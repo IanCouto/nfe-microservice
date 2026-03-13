@@ -12,12 +12,6 @@ import { UpdateProdutoDto } from './dto/update-produto.dto';
 export class ProdutosController {
   constructor(private readonly produtosService: ProdutosService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Criar produto' })
-  create(@Body() dto: CreateProdutoDto) {
-    return this.produtosService.create(dto);
-  }
-
   @Get()
   @ApiOperation({ summary: 'Listar todos os produtos' })
   findAll() {
@@ -34,6 +28,12 @@ export class ProdutosController {
   @ApiOperation({ summary: 'Atualizar produto' })
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProdutoDto) {
     return this.produtosService.update(id, dto);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Criar produto' })
+  create(@Body() dto: CreateProdutoDto) {
+    return this.produtosService.create(dto);
   }
 
   @Delete(':id')

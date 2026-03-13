@@ -31,15 +31,6 @@ export class NfeController {
     return this.nfeService.findAll();
   }
 
-  /** Recebe dados da NF-e e inicia o processo de emissão (validação, XML, envio SEFAZ em background). */
-  @Post()
-  @ApiOperation({ summary: 'Enviar NF-e para emissão' })
-  @ApiResponse({ status: 201, description: 'NF-e recebida e em processamento' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos' })
-  create(@Body() dto: CreateNFeDto) {
-    return this.nfeService.emitir(dto);
-  }
-
   /** Retorna o XML da NF-e autorizada (rota mais específica antes de :id). */
   @Get(':id/xml')
   @ApiOperation({ summary: 'Obter XML da NF-e autorizada' })
@@ -58,15 +49,6 @@ export class NfeController {
     return this.nfeService.listItens(id);
   }
 
-  @Post(':id/itens')
-  @ApiOperation({ summary: 'Adicionar item à NF-e' })
-  addItem(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: CreateNfeItemDto,
-  ) {
-    return this.nfeService.addItem(id, dto);
-  }
-
   @Get(':id/itens/:itemId')
   @ApiOperation({ summary: 'Buscar item da NF-e' })
   getItem(
@@ -74,25 +56,6 @@ export class NfeController {
     @Param('itemId', ParseUUIDPipe) itemId: string,
   ) {
     return this.nfeService.getItem(id, itemId);
-  }
-
-  @Patch(':id/itens/:itemId')
-  @ApiOperation({ summary: 'Atualizar item da NF-e' })
-  updateItem(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-    @Body() dto: UpdateNfeItemDto,
-  ) {
-    return this.nfeService.updateItem(id, itemId, dto);
-  }
-
-  @Delete(':id/itens/:itemId')
-  @ApiOperation({ summary: 'Remover item da NF-e' })
-  async removeItem(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-  ) {
-    await this.nfeService.removeItem(id, itemId);
   }
 
   /** Retorna o status atual da nota: em_processamento, autorizada ou rejeitada. */
@@ -111,10 +74,47 @@ export class NfeController {
     return this.nfeService.update(id, dto);
   }
 
+  @Patch(':id/itens/:itemId')
+  @ApiOperation({ summary: 'Atualizar item da NF-e' })
+  updateItem(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Body() dto: UpdateNfeItemDto,
+  ) {
+    return this.nfeService.updateItem(id, itemId, dto);
+  }
+
   /** Remove NF-e. */
   @Delete(':id')
   @ApiOperation({ summary: 'Remover NF-e' })
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     await this.nfeService.remove(id);
+  }
+
+  @Delete(':id/itens/:itemId')
+  @ApiOperation({ summary: 'Remover item da NF-e' })
+  async removeItem(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+  ) {
+    await this.nfeService.removeItem(id, itemId);
+  }
+
+  /** Recebe dados da NF-e e inicia o processo de emissão (validação, XML, envio SEFAZ em background). */
+  @Post()
+  @ApiOperation({ summary: 'Enviar NF-e para emissão' })
+  @ApiResponse({ status: 201, description: 'NF-e recebida e em processamento' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos' })
+  create(@Body() dto: CreateNFeDto) {
+    return this.nfeService.emitir(dto);
+  }
+
+  @Post(':id/itens')
+  @ApiOperation({ summary: 'Adicionar item à NF-e' })
+  addItem(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CreateNfeItemDto,
+  ) {
+    return this.nfeService.addItem(id, dto);
   }
 }
