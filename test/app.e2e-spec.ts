@@ -19,11 +19,22 @@ describe('NF-e API (e2e)', () => {
   });
 
   afterAll(async () => {
+    // Aguarda o processamento assíncrono da SEFAZ (mock ~300ms) terminar antes de fechar a conexão com o banco.
+    await new Promise((r) => setTimeout(r, 600));
     await app.close();
   });
 
   it('GET / returns API name', () => {
     return request(app.getHttpServer()).get('/').expect(200).expect('NF-e Microservice API');
+  });
+
+  it('GET /health returns status ok', () => {
+    return request(app.getHttpServer())
+      .get('/health')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).toEqual({ status: 'ok' });
+      });
   });
 
   it('POST /nfe with invalid body returns 400', () => {
@@ -49,5 +60,14 @@ describe('NF-e API (e2e)', () => {
     expect(res.body).toHaveProperty('id');
     expect(res.body).toHaveProperty('status', 'em_processamento');
     expect(res.body).toHaveProperty('numero');
+
+    // Aguarda o mock SEFAZ processar para consultar o status
+    await new Promise((r) => setTimeout(r, 500));
+    const statusRes = await request(app.getHttpServer())
+      .get(`/nfe/${res.body.id}`)
+      .expect(200);
+    expect(statusRes.body).toHaveProperty('id', res.body.id);
+    expect(statusRes.body).toHaveProperty('numero');
+    expect(['em_processamento', 'autorizada', 'rejeitada']).toContain(statusRes.body.status);
   });
 });

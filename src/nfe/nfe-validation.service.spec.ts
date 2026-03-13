@@ -39,4 +39,33 @@ describe('NfeValidationService', () => {
     const dto = { ...validDto, itens: [] };
     expect(() => service.validateCreateDto(dto)).toThrow(BadRequestException);
   });
+
+  it('should reject invalid destinatario CNPJ', () => {
+    const dto = { ...validDto, destinatarioCnpj: '11111111111111' };
+    expect(() => service.validateCreateDto(dto)).toThrow(BadRequestException);
+  });
+
+  it('should reject item with invalid CFOP (not 4 digits)', () => {
+    const dto = {
+      ...validDto,
+      itens: [{ ...validDto.itens[0], cfop: '123' }],
+    };
+    expect(() => service.validateCreateDto(dto)).toThrow(BadRequestException);
+  });
+
+  it('should reject item with invalid CST (empty or > 3 chars)', () => {
+    const dto = {
+      ...validDto,
+      itens: [{ ...validDto.itens[0], cst: '' }],
+    };
+    expect(() => service.validateCreateDto(dto)).toThrow(BadRequestException);
+  });
+
+  it('should accept valid CFOP and CST', () => {
+    const dto = {
+      ...validDto,
+      itens: [{ ...validDto.itens[0], cfop: '5102', cst: '00' }],
+    };
+    expect(() => service.validateCreateDto(dto)).not.toThrow();
+  });
 });
