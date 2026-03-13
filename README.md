@@ -6,6 +6,19 @@ Microserviço de emissão de **Nota Fiscal Eletrônica (NF-e)** com API RESTful,
 
 ---
 
+## Conteúdo
+
+- [Testar com Docker](#testar-com-docker) — subir API + banco com um comando
+- [Instalação e execução local](#instalação-e-execução-local) — requisitos, env, banco, rodar
+- [API e endpoints](#api-e-endpoints) — Swagger, tabela de rotas, exemplo de emissão
+- [Funcionalidades implementadas](#funcionalidades-implementadas) — checklist do desafio
+- [Testes](#testes) — unitários e e2e
+- [Scripts](#scripts) — comandos npm
+- [Estrutura do projeto](#estrutura-do-projeto) — pastas e padrões
+- [Repositório e primeiro push](#repositório-e-primeiro-push)
+
+---
+
 ## Testar com Docker
 
 **Requisito:** ter o [Docker](https://www.docker.com/get-started) instalado e em execução (Docker Desktop no Windows/Mac ou Docker Engine no Linux).
@@ -28,13 +41,9 @@ Para parar: `docker compose down`.
 
 ---
 
-## Requisitos (execução local sem Docker)
+## Instalação e execução local
 
-- **Node.js** 18+ (local). **Node 24** no Docker e no CI.
-- **PostgreSQL** 14+ (ou use Docker só para o banco)
-- **npm** 9+
-
-## Instalação e execução (local)
+Para desenvolver ou rodar fora do Docker: **Node.js** 18+ (local; no Docker/CI usa-se Node 24), **PostgreSQL** 14+ e **npm** 9+.
 
 ### 1. Clonar e instalar dependências
 
@@ -110,13 +119,13 @@ npm run start:prod
 
 A API estará em **http://localhost:3000**.
 
-## Documentação da API (Swagger)
+---
 
-Com a aplicação rodando:
+## API e endpoints
 
-- **Swagger UI:** http://localhost:3000/api
+Com a aplicação rodando, a documentação interativa está em **http://localhost:3000/api** (Swagger).
 
-## Endpoints principais
+### Tabela de rotas
 
 | Método | Rota                         | Descrição                                      |
 |--------|------------------------------|-------------------------------------------------|
@@ -186,6 +195,8 @@ Resposta esperada (exemplo):
 
 Após alguns segundos, o mock SEFAZ autoriza a nota e o status em `GET /nfe/:id` passa a `autorizada`. O XML pode ser obtido em `GET /nfe/:id/xml`.
 
+---
+
 ## Funcionalidades implementadas
 
 O código inclui **comentários em português** em arquivos e funções importantes, explicando a função de cada parte.
@@ -202,7 +213,7 @@ O código inclui **comentários em português** em arquivos e funções importan
 ### Diferenciais
 
 - **Docker + Docker Compose** com PostgreSQL
-- **Testes automatizados**: unitários (ex.: validação NF-e) e e2e
+- **Testes automatizados**: unitários e e2e (ver seção [Testes](#testes) abaixo)
 - **Logs**: uso do Logger do NestJS
 - **Tratamento de erros**: validação com `class-validator` e respostas HTTP adequadas
 - **Autenticação JWT** opcional (`POST /auth/login`, guard aplicável via `JWT_REQUIRED=true`)
@@ -211,22 +222,54 @@ O código inclui **comentários em português** em arquivos e funções importan
 - **Estrutura em camadas**: controller, service, repository, entities, DTOs
 - **Webhook** `/webhook/retorno-sefaz` para simular retorno da SEFAZ
 
-## Segurança e dependências
+**Segurança:** `npm audit` pode reportar vulnerabilidades; várias vêm de devDependencies. Use `npm audit fix` para correções seguras.
 
-- `npm audit` pode reportar vulnerabilidades; várias vêm de **devDependencies** (NestJS CLI, Angular DevKit, etc.). Use `npm audit fix` para correções seguras; `npm audit fix --force` pode exigir atualizações major — teste o projeto após.
+---
+
+## Testes
+
+O projeto possui **testes unitários** (Jest) e **testes e2e** (API real com banco).
+
+### Comandos
+
+| Comando              | Descrição |
+|----------------------|-----------|
+| `npm run test`       | Testes unitários (todos os `*.spec.ts` em `src/`) |
+| `npm run test:cov`   | Testes unitários + relatório de cobertura |
+| `npm run test:e2e`   | Testes e2e (requer PostgreSQL rodando) |
+
+### Testes unitários
+
+- **Onde:** arquivos `*.spec.ts` ao lado do código em `src/` (ex.: `src/nfe/nfe.service.spec.ts`, `src/clientes/clientes.service.spec.ts`).
+- **O que cobre:** services, controllers, validação NF-e, mock SEFAZ, validador XML, CRUD de clientes/produtos, auth, webhook, seed, config. Cobertura em torno de **~78%** (statements).
+- **Como rodar:** `npm run test` ou `npm run test:cov` (não precisa de banco).
+
+### Testes e2e
+
+- **Onde:** `test/app.e2e-spec.ts` (config: `test/jest-e2e.json`).
+- **O que cobre:** aplicação sobe com `AppModule` e banco real; testes verificam:
+  - `GET /` — mensagem da API
+  - `GET /health` — status ok
+  - `POST /nfe` com body inválido — 400
+  - `POST /nfe` com body válido — 201, criação da nota e consulta de status em `GET /nfe/:id`
+- **Requisito:** PostgreSQL disponível (ex.: `docker compose -f docker-compose.dev.yml up -d` antes de rodar `npm run test:e2e`).
+
+---
 
 ## Scripts
 
 | Comando              | Descrição                |
 |----------------------|--------------------------|
 | `npm run start`      | Inicia a aplicação       |
-| `npm run start:dev`  | Inicia em modo watch   |
+| `npm run start:dev`  | Inicia em modo watch     |
 | `npm run build`      | Gera build de produção   |
 | `npm run start:prod` | Roda o build de produção |
 | `npm run test`       | Testes unitários         |
-| `npm run test:e2e`   | Testes e2e               |
-| `npm run test:cov`   | Cobertura de testes      |
+| `npm run test:cov`   | Testes unitários + cobertura |
+| `npm run test:e2e`   | Testes e2e (banco deve estar rodando) |
 | `npm run lint`       | Linter                   |
+
+---
 
 ## Estrutura do projeto
 
@@ -312,6 +355,8 @@ src/
 
 Referência: [NestJS – Modules (Feature modules)](https://docs.nestjs.com/modules) e estrutura recomendada por feature.
 
+---
+
 ## Repositório e primeiro push
 
 O repositório remoto está configurado como **https://github.com/IanCouto/nfe-microservice**. Se o repositório ainda não existir no GitHub:
@@ -325,6 +370,8 @@ O repositório remoto está configurado como **https://github.com/IanCouto/nfe-m
    ```
 
 (O frontend ficará em um repositório separado: **IanCouto/nfe-microservice-frontend** ou similar.)
+
+---
 
 ## Licença
 
