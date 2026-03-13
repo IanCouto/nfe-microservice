@@ -29,6 +29,8 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_DATABASE: nfe_db
+      DB_SYNC: "true"
+      SEED_DB: "true"
     depends_on:
       postgres:
         condition: service_healthy

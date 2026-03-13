@@ -16,6 +16,7 @@ import { NfeModule } from './nfe/nfe.module';
 import { WebhookModule } from './webhook/webhook.module';
 import { ClientesModule } from './clientes/clientes.module';
 import { ProdutosModule } from './produtos/produtos.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ProdutosModule } from './produtos/produtos.module';
     ProdutosModule,
     NfeModule,
     WebhookModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [
