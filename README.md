@@ -230,16 +230,87 @@ O código inclui **comentários em português** em arquivos e funções importan
 
 ## Estrutura do projeto
 
+A organização segue o **padrão modular do NestJS** (feature modules) com entidades e configuração compartilhadas na raiz de `src/`.
+
 ```
 src/
-├── auth/           # Autenticação JWT (login, guard, strategy)
-├── config/         # Configuração (ex.: database)
-├── entities/       # Entidades TypeORM (Cliente, Produto, NotaFiscal, NotaFiscalItem)
-├── nfe/            # Módulo NF-e (controller, service, repository, validação, SEFAZ mock, XML)
-├── webhook/        # Webhook retorno SEFAZ
-├── app.module.ts
-└── main.ts
+├── app.module.ts       # Módulo raiz (importa todos os feature modules)
+├── app.controller.ts
+├── app.service.ts
+├── main.ts             # Bootstrap da aplicação
+│
+├── config/             # Configuração global (database, env)
+│   └── database.config.ts
+│
+├── entities/           # Entidades TypeORM compartilhadas entre módulos
+│   ├── index.ts
+│   ├── cliente.entity.ts
+│   ├── produto.entity.ts
+│   ├── nota-fiscal.entity.ts
+│   └── nota-fiscal-item.entity.ts
+│
+├── auth/               # Autenticação JWT (login, guard, strategy, decorator)
+│   ├── auth.module.ts
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── jwt.strategy.ts
+│   ├── jwt-auth.guard.ts
+│   └── public.decorator.ts
+│
+├── clientes/           # CRUD de clientes (emitentes/destinatários)
+│   ├── clientes.module.ts
+│   ├── clientes.controller.ts
+│   ├── clientes.service.ts
+│   └── dto/
+│       ├── create-cliente.dto.ts
+│       └── update-cliente.dto.ts
+│
+├── produtos/            # CRUD de produtos
+│   ├── produtos.module.ts
+│   ├── produtos.controller.ts
+│   ├── produtos.service.ts
+│   └── dto/
+│       ├── create-produto.dto.ts
+│       └── update-produto.dto.ts
+│
+├── nfe/                 # Módulo NF-e (emissão, listagem, itens, integração SEFAZ)
+│   ├── nfe.module.ts
+│   ├── nfe.controller.ts
+│   ├── nfe.service.ts
+│   ├── nfe.repository.ts
+│   ├── nfe-validation.service.ts
+│   ├── dto/
+│   │   ├── create-nfe.dto.ts
+│   │   ├── update-nfe.dto.ts
+│   │   ├── create-nfe-item.dto.ts
+│   │   └── update-nfe-item.dto.ts
+│   └── sefaz/           # Subdomínio SEFAZ (mock, validação XML)
+│       ├── sefaz-mock.service.ts
+│       └── xml-validator.service.ts
+│
+├── webhook/             # Webhook para retorno/callback SEFAZ
+│   ├── webhook.module.ts
+│   ├── webhook.controller.ts
+│   └── webhook.service.ts
+│
+└── seed/                # Seed do banco (dados iniciais quando SEED_DB=true)
+    ├── seed.module.ts
+    └── seed.service.ts
 ```
+
+### Padrão seguido
+
+| Prática | Descrição |
+|--------|-----------|
+| **Feature modules** | Cada domínio (auth, clientes, produtos, nfe, webhook) é um módulo NestJS com seu próprio `*.module.ts`, controller e service. Tudo que pertence ao domínio fica na mesma pasta. |
+| **Entidades compartilhadas** | As entidades TypeORM ficam em `entities/` na raiz porque são usadas por mais de um módulo (ex.: `Cliente` e `Produto` por Nfe e por seus CRUDs). |
+| **DTOs por módulo** | Cada módulo tem sua pasta `dto/` com DTOs de criação (`create-*.dto.ts`) e atualização (`update-*.dto.ts`), usando `class-validator` e `@nestjs/swagger`. |
+| **Configuração centralizada** | `config/` concentra configurações (banco, env). O TypeORM é configurado no `AppModule` com `TypeOrmModule.forRootAsync()`. |
+| **Subpastas para subdomínios** | Dentro de um módulo, lógica coesa pode ir em subpasta (ex.: `nfe/sefaz/` para serviços de integração SEFAZ e XML). |
+| **Repository no módulo** | O acesso a dados complexos (ex.: NF-e com itens e emitente) fica em um repositório injetável (`nfe.repository.ts`) em vez de espalhar queries no service. |
+| **Testes ao lado do código** | Arquivos `*.spec.ts` ficam na mesma pasta do arquivo testado (ex.: `nfe-validation.service.spec.ts` em `nfe/`). |
+
+Referência: [NestJS – Modules (Feature modules)](https://docs.nestjs.com/modules) e estrutura recomendada por feature.
 
 ## Repositório e primeiro push
 
