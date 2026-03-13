@@ -357,22 +357,6 @@ Referência: [NestJS – Modules (Feature modules)](https://docs.nestjs.com/modu
 
 ---
 
-## Repositório e primeiro push
-
-O repositório remoto está configurado como **https://github.com/IanCouto/nfe-microservice**. Se o repositório ainda não existir no GitHub:
-
-1. Acesse [github.com/new](https://github.com/new).
-2. Nome do repositório: **nfe-microservice**.
-3. Crie **sem** README, .gitignore ou licença (o projeto já tem).
-4. Depois, na pasta do projeto:
-   ```bash
-   git push -u origin master
-   ```
-
-(O frontend ficará em um repositório separado: **IanCouto/nfe-microservice-frontend** ou similar.)
-
----
-
 ## Licença
 
 MIT
