@@ -1,7 +1,7 @@
 /**
  * Serviço de negócio da NF-e: orquestra validação, geração de XML, persistência e envio ao SEFAZ (mock).
  */
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { NfeRepository } from './nfe.repository';
 import { NfeValidationService } from './nfe-validation.service';
 import { SefazMockService } from './sefaz/sefaz-mock.service';
@@ -13,6 +13,8 @@ import { UpdateNfeItemDto } from './dto/update-nfe-item.dto';
 
 @Injectable()
 export class NfeService {
+  private readonly logger = new Logger(NfeService.name);
+
   constructor(
     private readonly repository: NfeRepository,
     private readonly validation: NfeValidationService,
@@ -70,7 +72,9 @@ export class NfeService {
     );
 
     // Processamento assíncrono com SEFAZ (mock) — simula fila de emissão
-    this.processarSefaz(nota.id, xmlEnviado).catch(() => {});
+    this.processarSefaz(nota.id, xmlEnviado).catch((err) => {
+      this.logger.error(`Falha ao processar SEFAZ para nota ${nota.id}: ${err?.message ?? err}`);
+    });
 
     return {
       id: nota.id,
