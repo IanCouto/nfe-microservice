@@ -1,12 +1,15 @@
 /**
  * Serviço de negócio da NF-e: orquestra validação, geração de XML, persistência e envio ao SEFAZ (mock).
  */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { NfeRepository } from './nfe.repository';
 import { NfeValidationService } from './nfe-validation.service';
 import { SefazMockService } from './sefaz/sefaz-mock.service';
 import { XmlValidatorService } from './sefaz/xml-validator.service';
 import { CreateNFeDto } from './dto/create-nfe.dto';
+import { UpdateNfeDto } from './dto/update-nfe.dto';
+import { CreateNfeItemDto } from './dto/create-nfe-item.dto';
+import { UpdateNfeItemDto } from './dto/update-nfe-item.dto';
 
 @Injectable()
 export class NfeService {
@@ -20,6 +23,12 @@ export class NfeService {
   /** Valida DTO, gera XML, persiste a nota e dispara processamento assíncrono com a SEFAZ. */
   async emitir(dto: CreateNFeDto) {
     this.validation.validateCreateDto(dto);
+    for (const item of dto.itens) {
+      if (item.produtoId) {
+        const prod = await this.repository.findProdutoById(item.produtoId);
+        if (!prod) throw new BadRequestException(`Produto não encontrado: ${item.produtoId}`);
+      }
+    }
 
     const emitente = await this.repository.findOrCreateEmitente(dto);
     const numero = await this.repository.getNextNumero();
@@ -114,5 +123,73 @@ export class NfeService {
       );
     }
     return { xml: nota.xmlAutorizado };
+  }
+
+  /** Lista todas as notas fiscais. */
+  async findAll() {
+    return this.repository.findAll();
+  }
+
+  /** Atualiza NF-e (status, motivoRejeicao). */
+  async update(id: string, dto: UpdateNfeDto) {
+    const nota = await this.repository.findById(id);
+    if (!nota) throw new NotFoundException('NF-e não encontrada');
+    const updated = await this.repository.update(id, {
+      status: dto.status,
+      motivoRejeicao: dto.motivoRejeicao,
+    });
+    return updated;
+  }
+
+  /** Remove NF-e (e itens em cascade). */
+  async remove(id: string): Promise<void> {
+    const nota = await this.repository.findById(id);
+    if (!nota) throw new NotFoundException('NF-e não encontrada');
+    await this.repository.remove(id);
+  }
+
+  /** Lista itens de uma NF-e. */
+  async listItens(notaId: string) {
+    await this.getStatus(notaId);
+    return this.repository.findItensByNotaId(notaId);
+  }
+
+  /** Retorna um item da NF-e. */
+  async getItem(notaId: string, itemId: string) {
+    await this.getStatus(notaId);
+    const item = await this.repository.findItemById(notaId, itemId);
+    if (!item) throw new NotFoundException('Item não encontrado');
+    return item;
+  }
+
+  /** Adiciona item à NF-e. */
+  async addItem(notaId: string, dto: CreateNfeItemDto) {
+    const nota = await this.repository.findById(notaId);
+    if (!nota) throw new NotFoundException('NF-e não encontrada');
+    if (dto.produtoId) {
+      const prod = await this.repository.findProdutoById(dto.produtoId);
+      if (!prod) throw new BadRequestException('Produto não encontrado');
+    }
+    return this.repository.addItem(notaId, {
+      descricao: dto.descricao,
+      quantidade: dto.quantidade,
+      valorUnitario: dto.valorUnitario,
+      cfop: dto.cfop,
+      cst: dto.cst,
+      ncm: dto.ncm,
+      produtoId: dto.produtoId,
+    });
+  }
+
+  /** Atualiza item da NF-e. */
+  async updateItem(notaId: string, itemId: string, dto: UpdateNfeItemDto) {
+    await this.getItem(notaId, itemId);
+    return this.repository.updateItem(itemId, dto as Record<string, unknown>);
+  }
+
+  /** Remove item da NF-e. */
+  async removeItem(notaId: string, itemId: string): Promise<void> {
+    await this.getItem(notaId, itemId);
+    await this.repository.removeItem(itemId);
   }
 }

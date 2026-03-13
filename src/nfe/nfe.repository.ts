@@ -129,4 +129,105 @@ export class NfeRepository {
       relations: ['itens', 'emitente'],
     });
   }
+
+  /** Lista todas as notas fiscais com itens e emitente. */
+  async findAll(): Promise<NotaFiscal[]> {
+    return this.notaFiscalRepo.find({
+      relations: ['itens', 'emitente'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /** Atualiza campos da nota (ex.: status, motivoRejeicao). */
+  async update(
+    id: string,
+    data: { status?: string; motivoRejeicao?: string },
+  ): Promise<NotaFiscal | null> {
+    await this.notaFiscalRepo.update(id, data as Record<string, unknown>);
+    return this.findById(id);
+  }
+
+  /** Remove nota fiscal (cascade remove itens). */
+  async remove(id: string): Promise<void> {
+    await this.notaFiscalRepo.delete(id);
+  }
+
+  /** Lista itens de uma nota. */
+  async findItensByNotaId(notaId: string): Promise<NotaFiscalItem[]> {
+    return this.itemRepo.find({
+      where: { notaFiscalId: notaId },
+      relations: ['produto'],
+    });
+  }
+
+  /** Verifica se produto existe (para validação ao adicionar item). */
+  async findProdutoById(id: string): Promise<Produto | null> {
+    return this.produtoRepo.findOne({ where: { id } });
+  }
+
+  /** Busca um item por ID e nota. */
+  async findItemById(notaId: string, itemId: string): Promise<NotaFiscalItem | null> {
+    return this.itemRepo.findOne({
+      where: { id: itemId, notaFiscalId: notaId },
+      relations: ['produto'],
+    });
+  }
+
+  /** Adiciona item à nota. */
+  async addItem(
+    notaId: string,
+    data: {
+      descricao: string;
+      quantidade: number;
+      valorUnitario: number;
+      cfop?: string | null;
+      cst?: string | null;
+      ncm?: string | null;
+      produtoId?: string | null;
+    },
+  ): Promise<NotaFiscalItem> {
+    const valorTotal = data.quantidade * data.valorUnitario;
+    const item = this.itemRepo.create({
+      notaFiscalId: notaId,
+      descricao: data.descricao,
+      quantidade: data.quantidade,
+      valorUnitario: data.valorUnitario,
+      valorTotal,
+      cfop: data.cfop ?? null,
+      cst: data.cst ?? null,
+      ncm: data.ncm ?? null,
+      produtoId: data.produtoId ?? null,
+    });
+    return this.itemRepo.save(item);
+  }
+
+  /** Atualiza item. */
+  async updateItem(
+    itemId: string,
+    data: Partial<{
+      descricao: string;
+      quantidade: number;
+      valorUnitario: number;
+      cfop: string;
+      cst: string;
+      ncm: string;
+      produtoId: string | null;
+    }>,
+  ): Promise<NotaFiscalItem> {
+    const item = await this.itemRepo.findOne({ where: { id: itemId } });
+    if (!item) return null as unknown as NotaFiscalItem;
+    const update: Record<string, unknown> = { ...data };
+    if (data.quantidade != null || data.valorUnitario != null) {
+      const q = data.quantidade ?? Number(item.quantidade);
+      const v = data.valorUnitario ?? Number(item.valorUnitario);
+      update.valorTotal = q * v;
+    }
+    await this.itemRepo.update(itemId, update);
+    return this.itemRepo.findOne({ where: { id: itemId }, relations: ['produto'] }) as Promise<NotaFiscalItem>;
+  }
+
+  /** Remove item. */
+  async removeItem(itemId: string): Promise<void> {
+    await this.itemRepo.delete(itemId);
+  }
 }
