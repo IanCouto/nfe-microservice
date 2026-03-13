@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { NfeModule } from './nfe/nfe.module';
 import { WebhookModule } from './webhook/webhook.module';
 import { ClientesModule } from './clientes/clientes.module';
+import { ProdutosModule } from './produtos/produtos.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ClientesModule } from './clientes/clientes.module';
     }),
     AuthModule,
     ClientesModule,
+    ProdutosModule,
     NfeModule,
     WebhookModule,
   ],
