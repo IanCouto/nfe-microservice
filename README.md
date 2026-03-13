@@ -36,25 +36,6 @@ Para parar: `docker compose down`.
 
 ## Instalação e execução (local)
 
-### Script único (deixar a API funcionando)
-
-Para subir o ambiente e deixar a API respondendo com um comando:
-
-- **Windows (PowerShell):**
-  ```powershell
-  .\run.ps1
-  ```
-  Se a execução de scripts estiver bloqueada: `powershell -ExecutionPolicy Bypass -File run.ps1`
-- **Linux / macOS:**
-  ```bash
-  chmod +x run.sh
-  ./run.sh
-  ```
-
-O script cria `.env` se não existir, sobe PostgreSQL e a API (via Docker Compose, se Docker estiver instalado) ou usa PostgreSQL local + `npm run build` e inicia a API em segundo plano. Ao final, a API estará em **http://localhost:3000** e o Swagger em **http://localhost:3000/api**.
-
-No **Windows**, o Docker Desktop usa o comando `docker compose` (com espaço); o script detecta automaticamente `docker compose` ou `docker-compose`.
-
 ### 1. Clonar e instalar dependências
 
 ```bash
@@ -81,6 +62,8 @@ Principais variáveis:
 | `DB_USERNAME`  | Usuário do banco            | postgres   |
 | `DB_PASSWORD`  | Senha do banco              | postgres   |
 | `DB_DATABASE`  | Nome do banco               | nfe_db     |
+| `DB_SYNC`      | Sincronizar schema (true/false) | (Docker: true) |
+| `SEED_DB`      | Popular banco com dados de exemplo na subida (true/false) | (Docker: true) |
 | `JWT_SECRET`   | Chave para tokens JWT       | (ver .env.example) |
 | `JWT_REQUIRED` | Exigir JWT nas rotas (true/false) | (opcional, default não exige) |
 
@@ -108,7 +91,7 @@ docker compose up -d
 # ou: docker-compose up -d
 ```
 
-A API estará em `http://localhost:3000`.
+A API estará em `http://localhost:3000`. Com `SEED_DB=true` (já configurado no `docker-compose.yml`), na primeira subida o banco é populado com **dados de exemplo**: 3 clientes, 3 produtos e 1 NF-e autorizada com 1 item. Assim você pode testar os CRUDs e a emissão de NF-e usando os IDs retornados em `GET /clientes` e `GET /produtos`.
 
 ### 4. Rodar a aplicação
 
@@ -135,15 +118,38 @@ Com a aplicação rodando:
 
 ## Endpoints principais
 
-| Método | Rota                     | Descrição                                      |
-|--------|--------------------------|-------------------------------------------------|
-| GET    | `/`                      | Mensagem de boas-vindas                         |
-| GET    | `/health`                | Health check                                    |
-| POST   | `/nfe`                   | Enviar NF-e para emissão                        |
-| GET    | `/nfe/:id`               | Consultar status da NF-e                        |
-| GET    | `/nfe/:id/xml`           | Obter XML da NF-e autorizada                    |
-| POST   | `/webhook/retorno-sefaz` | Simular retorno/callback da SEFAZ (homologação) |
-| POST   | `/auth/login`            | Login e obter JWT (opcional)                    |
+| Método | Rota                         | Descrição                                      |
+|--------|------------------------------|-------------------------------------------------|
+| GET    | `/`                          | Mensagem de boas-vindas                         |
+| GET    | `/health`                    | Health check                                    |
+| **Clientes** | | |
+| GET    | `/clientes`                  | Listar clientes                                 |
+| POST   | `/clientes`                  | Criar cliente                                   |
+| GET    | `/clientes/:id`              | Buscar cliente por ID                           |
+| PATCH  | `/clientes/:id`              | Atualizar cliente                               |
+| DELETE | `/clientes/:id`              | Remover cliente                                 |
+| **Produtos** | | |
+| GET    | `/produtos`                  | Listar produtos                                 |
+| POST   | `/produtos`                  | Criar produto                                   |
+| GET    | `/produtos/:id`              | Buscar produto por ID                           |
+| PATCH  | `/produtos/:id`              | Atualizar produto                               |
+| DELETE | `/produtos/:id`              | Remover produto                                 |
+| **NF-e** | | |
+| GET    | `/nfe`                       | Listar todas as NF-e                             |
+| POST   | `/nfe`                       | Enviar NF-e para emissão                        |
+| GET    | `/nfe/:id`                   | Consultar status da NF-e                        |
+| GET    | `/nfe/:id/xml`               | Obter XML da NF-e autorizada                    |
+| PATCH  | `/nfe/:id`                   | Atualizar NF-e (status, motivoRejeicao)          |
+| DELETE | `/nfe/:id`                   | Remover NF-e                                    |
+| **Itens da NF-e** | | |
+| GET    | `/nfe/:id/itens`             | Listar itens da NF-e                             |
+| POST   | `/nfe/:id/itens`             | Adicionar item à NF-e                           |
+| GET    | `/nfe/:id/itens/:itemId`     | Buscar item                                     |
+| PATCH  | `/nfe/:id/itens/:itemId`     | Atualizar item                                  |
+| DELETE | `/nfe/:id/itens/:itemId`     | Remover item                                    |
+| **Outros** | | |
+| POST   | `/webhook/retorno-sefaz`     | Simular retorno/callback da SEFAZ (homologação) |
+| POST   | `/auth/login`                | Login e obter JWT (opcional)                    |
 
 ### Exemplo – Emitir NF-e
 
