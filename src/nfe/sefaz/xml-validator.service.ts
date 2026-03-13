@@ -26,12 +26,15 @@ export class XmlValidatorService {
     }
 
     const obj = parsed as Record<string, unknown>;
-    const nfe = obj.nfeProc ?? obj.NFe ?? obj.nfe;
-    if (!nfe) {
+    const nfeProc = obj.nfeProc ?? obj.NFe ?? obj.nfe;
+    if (!nfeProc) {
       throw new BadRequestException('XML não contém elemento raiz NFe/nfeProc');
     }
-
-    const infNFe = (nfe as Record<string, unknown>).infNFe ?? (nfe as Record<string, unknown>).infNfe;
+    const nfeObj = nfeProc as Record<string, unknown>;
+    const nfe = nfeObj.NFe ?? nfeObj.nfe ?? nfeProc;
+    const infNFe =
+      (nfe as Record<string, unknown>).infNFe ??
+      (nfe as Record<string, unknown>).infNfe;
     if (!infNFe) {
       throw new BadRequestException('XML não contém infNFe');
     }

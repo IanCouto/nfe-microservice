@@ -12,8 +12,9 @@ import {
   Length,
   IsNumber,
   Min,
+  IsUUID,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 /** Item da nota: descrição, quantidade, valor unitário, CFOP, CST, NCM (opcionais). */
 export class NFeItemDto {
@@ -51,9 +52,10 @@ export class NFeItemDto {
   @Length(4, 10)
   ncm?: string;
 
-  @ApiPropertyOptional({ description: 'ID do produto (se cadastrado)' })
+  @ApiPropertyOptional({ description: 'ID do produto (UUID, se cadastrado)' })
   @IsOptional()
-  @IsString()
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsUUID('4', { message: 'produtoId deve ser um UUID válido quando informado' })
   produtoId?: string;
 }
 

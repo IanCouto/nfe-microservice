@@ -31,7 +31,7 @@ export class Cliente {
   @Column({ name: 'endereco', type: 'varchar', length: 255, nullable: true })
   endereco: string | null;
 
-  @Column({ name: 'municipio', type: 'varchar', length: 10, nullable: true })
+  @Column({ name: 'municipio', type: 'varchar', length: 255, nullable: true })
   municipio: string | null;
 
   @Column({ name: 'uf', type: 'varchar', length: 2, nullable: true })
